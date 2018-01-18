@@ -53,8 +53,8 @@ var Module = {
     preRun: [],
     postRun: [
         function() {
-            var file = new DataView(FS.readFile('/fs/testData/deep_mlp/import-Placeholder_0.idx').buffer, 12, (28 * 28 * 4));
-            window.f = file;
+            // var file = new DataView(FS.readFile('/fs/testData/deep_mlp/import-Placeholder_0.idx').buffer, 12, (28 * 28 * 4));
+            // window.f = file;
 
             var c = document.createElement('div');
             c.innerHTML = '<canvas id="mlp"></canvas><button id="clear-utensor">Clear canvas</button>';

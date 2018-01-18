@@ -1,44 +1,42 @@
-/**
- * This is a demo application for uTensor - an AI interference library for
- * deep learning on small microcontrollers.
- * It's trained to recognize handwritten digits via the MNIST data set.
- *
- * See https://github.com/utensor/utensor
- */
-
 #include "mbed.h"
 #include "tensor.hpp"
-#include "deep_mnist_mlp.hpp"
+#include "tensorIdxImporter.hpp"
+#include "deep_mlp.hpp"
 #include "emscripten.h"
 #include "C12832.h"
 
-C12832 lcd(SPI_MOSI, SPI_SCK, SPI_MISO, p8, p11);
 
+C12832 lcd(SPI_MOSI, SPI_SCK, SPI_MISO, p8, p11);
 EventQueue queue;
 InterruptIn btn(BUTTON1);
 
-void run_mlp() {
+
+void run_mlp(){
     EM_ASM({
         // this writes the content of the canvas (in the simulator) to /fs/tmp.idx
         window.dumpCanvasToTmpFile();
     });
 
-    // invoke the MLP algorithm against the temp file (just saved from canvas)
-    int prediction = runMLP("/fs/tmp.idx");
+    TensorIdxImporter t_import;
+    Tensor* input_x = t_import.float_import("/fs/tmp.idx");
+    Context ctx;
+
+    get_quant_mnist_ctx(ctx, input_x);
+    S_TENSOR pred_tensor = ctx.get("y_pred:0");
+    ctx.eval();
+
+    int pred_label = *(pred_tensor->read<int>(0, 0));
     lcd.cls();
     lcd.locate(3, 13);
-    lcd.printf("Predicted: %d", prediction);
+    lcd.printf("Predicted label: %d\n", pred_label);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv){
     init_env();
-
-    printf("Deep MLP on Mbed (Trained with Tensorflow)\n");
-    printf("Draw a number (0-9) on the canvas, then hit the button on the board to run MLP algorithm\n\n");
-
-    printf("Please draw the image as large as possible *in the gray box* for best results\n");
-
+    printf("Simple MNIST end-to-end uTensor cli example on mbed-simulator\n");
+    
     btn.fall(queue.event(&run_mlp));
-
     queue.dispatch_forever();
+
+    return 0;
 }

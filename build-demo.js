@@ -50,7 +50,7 @@ let args = cFiles
         '-s', 'NO_EXIT_RUNTIME=1',
         // '-s', 'ASSERTIONS=2',
 
-        '--preload-file', '/Users/janjon01/repos/uTensor/TESTS/scripts@/fs',
+        '--preload-file', Path.join(__dirname, 'data') + '@/fs',
 
         '-D__MBED__',
         '-DMBEDTLS_TEST_NULL_ENTROPY',
