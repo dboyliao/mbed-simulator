@@ -1,15 +1,15 @@
-#include "mbed.h"
-#include "tensor.hpp"
+#include "quant_mnist.hpp"
 #include "tensorIdxImporter.hpp"
-#include "deep_mlp.hpp"
+#include "tensor.hpp"
+#include "mbed.h"
 #include "emscripten.h"
 #include "C12832.h"
+#include <string>
 
 
 C12832 lcd(SPI_MOSI, SPI_SCK, SPI_MISO, p8, p11);
 EventQueue queue;
 InterruptIn btn(BUTTON1);
-
 
 void run_mlp(){
     EM_ASM({
@@ -28,10 +28,10 @@ void run_mlp(){
     int pred_label = *(pred_tensor->read<int>(0, 0));
     lcd.cls();
     lcd.locate(3, 13);
-    lcd.printf("Predicted label: %d\n", pred_label);
+    lcd.printf("Predicted label: %d", pred_label);
 }
 
-int main(int argc, char** argv){
+int main(void){
     init_env();
     printf("Simple MNIST end-to-end uTensor cli example on mbed-simulator\n");
     
